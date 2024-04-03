@@ -110,8 +110,9 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
         if elisa_conf is not None:
             elisa_conf_data = json.load(open(elisa_conf,'r')).get(apparatus_id)
 
-        if elisa_conf_data is None and elisa_conf is not None:
-            logger.warning(f"Can't find apparatus \'{apparatus_id}\' in {elisa_conf}, trying with the dotnanorc")
+        if elisa_conf_data is None:
+            if elisa_conf is not None:
+                logger.warning(f"Can't find apparatus \'{apparatus_id}\' in {elisa_conf}, trying with the dotnanorc")
             elisa_conf_data = cern_profile['elisa_configuration'].get(apparatus_id)
 
         if elisa_conf_data is None:
