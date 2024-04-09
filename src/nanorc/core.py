@@ -97,20 +97,15 @@ class NanoRC:
         self.logbook = None
         self.log_path = None
 
-        if logbook_type != 'file' and logbook_type != None and logbook_type != '':
+        if logbook_type != 'file':
             try:
-                elisa_conf = json.load(open(logbook_type,'r'))
-                if elisa_conf.get(self.apparatus_id):
-                    self.logbook = ElisaLogbook(
-                        configuration = elisa_conf[self.apparatus_id],
-                        console = console,
-                        session_handler = self.session_handler,
-                    )
-                else:
-                    self.log.error(f"Can't find config \'{self.apparatus_id}\' in {logbook_type}, reverting to file logbook!")
-                    logbook_type = 'file'
+                self.logbook = ElisaLogbook(
+                    configuration = logbook_type,
+                    console = console,
+                    session_handler = self.session_handler,
+                )
             except Exception as e:
-                self.log.error(f"Can't find \'{logbook_type}\', reverting to file logbook! {str(e)}")
+                self.log.error(f"Couldn't initialise ELisA, reverting to file logbook! {str(e)}")
                 logbook_type = 'file'
 
         if logbook_type == 'file':
