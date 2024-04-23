@@ -42,7 +42,7 @@ from nanorc.nano_context import NanoContext
 @click.option('-l', '--loglevel', type=click.Choice(loglevels.keys(), case_sensitive=False), default='INFO', help='Set the log level')
 @click.option('--log-path', type=click.Path(exists=True), default='/log', help='Where the logs should go (on localhost of applications)')
 @accept_timeout(60)
-@click.option('--elisa-conf', type=click.Path(exists=True), default=None, help='ELisA configuration (by default, use the one in src/nanorc/confdata)')
+@click.option('--elisa-conf', type=click.Path(exists=True), default=None, help='ELisA configuration (by default, use the one in dotnanorc["elisa_configuration"])')
 @click.option('--cfg-dumpdir', type=click.Path(), default="./", help='Path where the config gets copied on start')
 @click.option('--dotnanorc', type=click.Path(), default="~/.nanorc.json", help='A JSON file which has auth/socket for the DB services')
 @click.option('--kerberos/--no-kerberos', default=False, help='Whether you want to use kerberos for communicating between processes')
@@ -57,10 +57,6 @@ from nanorc.nano_context import NanoContext
 @click.pass_context
 def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, dotnanorc, kerberos, timeout, partition_number, partition_label, web, tui, pm, cfg_dir, user):
 
-
-    if not elisa_conf:
-        with resources.path(confdata, "elisa_conf.json") as p:
-            elisa_conf = p
 
     obj.print_traceback = traceback
     grid = Table(title='Shonky Nano04RC', show_header=False, show_edge=False)
@@ -87,6 +83,7 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
         raise RuntimeError("cant have TUI and GUI at the same time")
 
     try:
+        logger = logging.getLogger("cli")
         dotnanorc = os.path.expanduser(dotnanorc)
         obj.console.print(f"[blue]Loading {dotnanorc}[/blue]")
         f = open(dotnanorc, 'r')
@@ -102,11 +99,26 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
                 user_data,
             )
 
-        logging.getLogger("cli").info("RunDB socket "+rundb_socket)
-        logging.getLogger("cli").info("RunRegistryDB socket "+runreg_socket)
+        logger.info("RunDB socket "+rundb_socket)
+        logger.info("RunRegistryDB socket "+runreg_socket)
 
         from nanorc.treebuilder import TreeBuilder
         apparatus_id, _ = TreeBuilder.get_apparatus_and_config(cfg_dir)
+
+        elisa_conf_data = None
+
+        if elisa_conf is not None:
+            elisa_conf_data = json.load(open(elisa_conf,'r')).get(apparatus_id)
+
+        if elisa_conf_data is None:
+            if elisa_conf is not None:
+                logger.warning(f"Can't find apparatus \'{apparatus_id}\' in {elisa_conf}, trying with the dotnanorc")
+            elisa_conf_data = cern_profile['elisa_configuration'].get(apparatus_id)
+
+        if elisa_conf_data is None:
+            logger.error(f"Can't find apparatus \'{apparatus_id}\' in dotnanorc, reverting to file logbook!")
+            elisa_conf_data = 'file'
+
 
         from nanorc.credmgr import CERNSessionHandler
         cern_auth = CERNSessionHandler(
@@ -122,7 +134,7 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             partition_label = partition_label,
             run_num_mgr = DBRunNumberManager(rundb_socket),
             run_registry = DBConfigSaver(runreg_socket),
-            logbook_type = elisa_conf,
+            logbook_type = elisa_conf_data,
             timeout = timeout,
             use_kerb = kerberos,
             port_offset = port_offset,

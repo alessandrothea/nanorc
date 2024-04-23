@@ -30,19 +30,19 @@ class FileLogbook:
         self.run_type = run_type
         self.website = self.file_name
         f = open(self.file_name, "a")
-        f.write(f"{self.now()}: User started a run {self.run_num}, of type {self.run_type} on {apparatus}\n")
-        f.write(f'{self.now()}: {message}\n')
+        f.write(f"{self.now()}: User started a run {self.run_num}, of type {self.run_type} on {session}\n")
+        f.write(f'{self.now()}: {messages}\n')
         f.close()
 
     def add_message(self, messages:str, session:str):
         f = open(self.file_name, "a")
-        f.write(f'{self.now()}: {message}\n')
+        f.write(f'{self.now()}: {messages}\n')
         f.close()
 
     def message_on_stop(self, messages:str, session:str):
         f = open(self.file_name, "a")
-        f.write(f"{self.now()} User stopped the run {self.run_num}, of type {self.run_type} on {apparatus}\n")
-        f.write(f'{self.now()}: {message}\n')
+        f.write(f"{self.now()} User stopped the run {self.run_num}, of type {self.run_type} on {session}\n")
+        f.write(f'{self.now()}: {messages}\n')
         f.close()
 
 
