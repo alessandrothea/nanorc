@@ -233,16 +233,14 @@ def add_run_start_parameters():
         f1 = click.argument('run_num', type=int)(function)
         f2 = click.option('--trigger-rate', type=float, default=None, help='Trigger rate (Hz)')(f1)
         f3 = click.option('--disable-data-storage/--enable-data-storage', type=bool, default=False, help='Toggle data storage')(f2)
-        f4 = click.option(
-            '--ignore-run-registry-insertion-error', type=bool, is_flag=True, default=False,
-            help='Start the run, even if saving the configuration into the run registry fails')(f3)
-        f5 = accept_timeout(None)(f4)
-        f6 = click.option('--run-type', type=click.Choice(['TEST', 'PROD']), default='TEST')(f5)
-        return click.option('--message', type=str, default="")(f6)
+        f4 = accept_timeout(None)(f3)
+        f5 = click.option('--run-type', type=click.Choice(['TEST', 'PROD']), default='TEST')(f4)
+        return click.option('--message', type=str, default="")(f5)
      # sigh end
     return add_decorator
 
 def start_defaults_overwrite(kwargs):
+    kwargs['ignore_run_registry_insertion_error'] = True
     #kwargs['run_type'] = 'TEST'
     kwargs['path'] = None
     return kwargs
