@@ -168,6 +168,8 @@ class K8SProcessManager(object):
         nslist = [ns.metadata.name for ns in self._core_v1_api.list_namespace().items]
         if namespace in nslist:
             self.log.debug(f"Not creating \"{namespace}\" namespace as it already exist")
+            self.log.info(f"Try `kubectl get pods -n {namespace}' and see if there is anything running")
+            self.log.info(f"If you are sure nothing is running and want to use same session name `kubectl delete ns {namespace}' before starting your next run")
             return
 
         self.log.info(f"Creating \"{namespace}\" namespace")
@@ -202,7 +204,7 @@ class K8SProcessManager(object):
     def delete_namespace(self, namespace: str):
         nslist = [ns.metadata.name for ns in self._core_v1_api.list_namespace().items]
         if not namespace in nslist:
-            self.log.debug(f"Not deleting \"{namespace}\" namespace as it already exist")
+            self.log.info(f"The \"{namespace}\" namespace has already been deleted")
             return
         self.log.info(f"Deleting \"{namespace}\" namespace")
         try:
