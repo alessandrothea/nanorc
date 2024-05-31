@@ -232,7 +232,7 @@ credentials = CredentialManager()
 
 
 class CERNSessionHandler:
-    def __init__(self, console, apparatus_id:str, session_number:int, username:str):
+    def __init__(self, console, apparatus_id:str, session_number:int, username:str, authenticate_elisa_user=True):
         self.console = console
         import logging
         self.log = logging.getLogger(self.__class__.__name__)
@@ -250,7 +250,7 @@ class CERNSessionHandler:
             self.log.error(f'User \'{username}\' cannot authenticate, exiting...')
             exit(1)
 
-        if not self.elisa_user_is_authenticated():
+        if not self.elisa_user_is_authenticated() and authenticate_elisa_user:
             self.authenticate_elisa_user()
 
     @staticmethod
