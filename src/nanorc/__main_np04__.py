@@ -35,6 +35,8 @@ from nanorc.common_commands import add_common_cmds, add_custom_cmds, accept_time
 from nanorc.cli import CONTEXT_SETTINGS, loglevels, updateLogLevel
 from nanorc.nano_context import NanoContext
 
+from .logbook import ElisaLogbook
+
 # ------------------------------------------------------------------------------
 @click_shell.shell(prompt='anonymous@np04rc> ', chain=True, context_settings=CONTEXT_SETTINGS)
 @click.version_option(__version__)
@@ -126,6 +128,7 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             apparatus_id = apparatus_id,
             session_number = partition_number,
             username = user,
+            authenticate_elisa_user = (elisa_conf_data != 'file')
         )
 
         rc = NanoRC(
@@ -265,10 +268,8 @@ def is_authenticated(rc):
         rc.log.error(f'\'{rc.session_handler.nanorc_user.username}\' does not have a valid kerberos ticket, use \'kinit\', or \'change_user\' to create a ticket, [bold]inside nanorc![/]', extra={"markup": True})
         return False
 
-    if not rc.session_handler.elisa_user_is_authenticated():
-        rc.session_handler.authenticate_elisa_user(
-            credentials.get_login('elisa')
-        )
+    if not rc.session_handler.elisa_user_is_authenticated() and (type(rc.logbook) == ElisaLogbook):
+        rc.session_handler.authenticate_elisa_user()
 
     return True
 

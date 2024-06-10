@@ -390,7 +390,7 @@ class NanoRC:
                     data=runtime_start_data,
                 )
             except Exception as e:
-                self.log.error(f'Couldn\'t save the configuration so not starting a run!\n{str(e)}')
+                self.log.error(f'Couldn\'t save the configuration!\n{str(e)}')
                 self.return_code = 1
                 if not ignore_run_registry_insertion_error:
                     raise e
