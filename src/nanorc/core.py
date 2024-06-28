@@ -69,7 +69,7 @@ class NanoRC:
         if not use_kerb:
             self.ssh_conf = ["-o GSSAPIAuthentication=no"]
         self.port_offset = port_offset
-        self.configuration_name = top_cfg
+        self.configuration_name = top_cfg.path
         self.cfg = TreeBuilder(
             log=self.log,
             top_cfg=top_cfg,
