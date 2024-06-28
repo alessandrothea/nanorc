@@ -115,9 +115,6 @@ class NanoRC:
 
         self.topnode = self.cfg.get_tree_structure()
         self.console.print(f"Running on the apparatus [bold red]{self.cfg.apparatus_id}[/bold red]:")
-    
-    def configuration_name(self):
-        return self.configuration_name
 
     def quit(self):
         self.cfg.terminate()
@@ -264,7 +261,7 @@ class NanoRC:
         self.console.print('\n')
         if self.runs:
             print_run_info(self.runs[-1], self.console )
-        print_status(apparatus_id=self.apparatus_id, topnode=self.topnode, console=self.console, partition=self.partition)
+        print_status(apparatus_id=self.apparatus_id, topnode=self.topnode, console=self.console, partition=self.partition, conf=self.configuration_name)
 
     def ls(self, leg:bool) -> NoReturn:
         """
