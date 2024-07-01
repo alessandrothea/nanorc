@@ -39,8 +39,8 @@ def status_data(node, get_children=True) -> dict:
     return ret
 
 
-def print_status(topnode, console, apparatus_id='', partition='') -> int:
-    table = Table(title=f"[bold]{apparatus_id}[/bold] applications" + (f" in partition [bold]{partition}[/bold]" if partition else ''))
+def print_status(topnode, console, apparatus_id='', partition='', conf='') -> int:
+    table = Table(title=f"[bold]{apparatus_id}[/bold] applications" + (f" in partition [bold]{partition}[/bold]" + (f" running using [bold]{conf}[/bold] configuration" if partition else '')))
     table.add_column("name", style="blue")
     table.add_column("state", style="blue")
     table.add_column("host", style="magenta")
