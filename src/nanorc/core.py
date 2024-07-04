@@ -13,7 +13,7 @@ from .treebuilder import TreeBuilder
 from .cfgsvr import FileConfigSaver, DBConfigSaver
 from .credmgr import credentials
 from .node_render import print_node, print_status
-from .logbook import ElisaLogbook, FileLogbook
+from .logbook import ElisaHandler, FileLogbook
 import importlib
 from . import confdata
 from rich.traceback import Traceback
@@ -49,6 +49,7 @@ class NanoRC:
             run_num_mgr,
             run_registry,
             logbook_type:str,
+            logbook_auth,
             timeout: int,
             use_kerb=True,
             logbook_prefix="./",
@@ -99,7 +100,7 @@ class NanoRC:
 
         if logbook_type != 'file':
             try:
-                self.logbook = ElisaHandler(socket = logbook_type,  session_handler = self.session_handle)
+                self.logbook = ElisaHandler(socket = logbook_type['socket'], auth=(logbook_auth['user'] , logbook_auth['password']), session_handler = self.session_handle)
             except Exception as e:
                 self.log.error(f"Couldn't initialise ELisA, reverting to file logbook! {str(e)}")
                 logbook_type = 'file'

@@ -49,8 +49,9 @@ class FileLogbook:
 
 
 class ElisaHandler:
-    def __init__(self, socket, session_handler):
+    def __init__(self, socket, auth, session_handler):
         self.socket = socket
+        self.auth = auth
         self.session_handler = session_hander
         self.log = logging.getLogger(self.__class__.__name__)
         self.log.info(f'Connected to ELisA logbook at {self.socket}')
@@ -64,14 +65,13 @@ class ElisaHandler:
 
     def _send_message(self, subject:str, body:str, command:str):
         user = self.session_handler.nanorc_user.username
-        #Since NAnoRC is sending these messages, is the system always DAQ?
-        data = {'author':user, 'title':subject, 'body':body, 'command':command, 'systems':["DAQ"]}
+        data = {'author':user, 'title':subject, 'body':body, 'command':command, 'systems':["daq"]}
 
         if not self.current_id:
-            r = requests.post(f'{self.socket}/v1/elisaLogbook/new_message', auth=(fooUsr,barPass), data=data)
+            r = requests.post(f'{self.socket}/v1/elisaLogbook/new_message/', auth=self.auth, data=data)
         else:
-            data["id"=self.current_id]
-            r = requests.put(f'{self.socket}/v1/elisaLogbook/reply_to_message', auth=(fooUsr,barPass), data=data)
+            data["id"] = self.current_id
+            r = requests.put(f'{self.socket}/v1/elisaLogbook/reply_to_message/', auth=self.auth, data=data)
 
         response = r.json()
         if r.status_code != 201:
@@ -79,9 +79,9 @@ class ElisaHandler:
             e = (response['response'])
             self.log.error(e)
             import logging
-                if logging.DEBUG >= logging.root.level:
-                    self.console.print_exception()
-                raise e
+            if logging.DEBUG >= logging.root.level:
+                self.console.print_exception()
+            raise e
         else:
             self.current_id = response['thread_id']
             self.log.info(f"ELisA logbook: Sent message (ID{self.current_id})")

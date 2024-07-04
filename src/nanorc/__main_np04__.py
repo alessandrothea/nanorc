@@ -114,10 +114,12 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             if elisa_conf is not None:
                 logger.warning(f"Can't find apparatus \'{apparatus_id}\' in {elisa_conf}, trying with the dotnanorc")
             elisa_conf_data = cern_profile['elisa_configuration'].get(apparatus_id)
+            elisa_auth = cern_profile['authentication']['elisa_logbook']
 
         if elisa_conf_data is None:
             logger.error(f"Can't find apparatus \'{apparatus_id}\' in dotnanorc, reverting to file logbook!")
             elisa_conf_data = 'file'
+            elisa_auth = None
 
 
         from nanorc.credmgr import CERNSessionHandler
@@ -135,6 +137,7 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             run_num_mgr = DBRunNumberManager(rundb_socket),
             run_registry = DBConfigSaver(runreg_socket),
             logbook_type = elisa_conf_data,
+            logbook_auth = elisa_auth,
             timeout = timeout,
             use_kerb = kerberos,
             port_offset = port_offset,
