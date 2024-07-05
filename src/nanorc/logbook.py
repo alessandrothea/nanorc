@@ -54,7 +54,6 @@ class ElisaHandler:
         self.session_handler = session_hander
         self.log = logging.getLogger(self.__class__.__name__)
         self.log.info(f'Connected to ELisA logbook at {self.socket}')
-        from .credmgr import credentials
         auth = credentials.get_login("elisa_logbook")
         self.API_USER=auth.username
         self.API_PSWD=auth.password

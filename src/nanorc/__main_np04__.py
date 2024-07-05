@@ -118,7 +118,6 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
         if elisa_conf_data is None:
             logger.error(f"Can't find apparatus \'{apparatus_id}\' in dotnanorc, reverting to file logbook!")
             elisa_conf_data = 'file'
-            elisa_auth = None
 
         if elisa_conf_data != 'file':
             elisa_socket = cern_profile['elisa_configuration']['socket']
