@@ -114,13 +114,15 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             if elisa_conf is not None:
                 logger.warning(f"Can't find apparatus \'{apparatus_id}\' in {elisa_conf}, trying with the dotnanorc")
             elisa_conf_data = cern_profile['elisa_configuration'].get(apparatus_id)
-            elisa_auth = cern_profile['authentication']['elisa_logbook']
 
         if elisa_conf_data is None:
             logger.error(f"Can't find apparatus \'{apparatus_id}\' in dotnanorc, reverting to file logbook!")
             elisa_conf_data = 'file'
             elisa_auth = None
 
+        if elisa_conf_data != 'file':
+            elisa_socket = cern_profile['elisa_configuration']['socket']
+            logger.info("ELisA socket "+elisa_socket)
 
         from nanorc.credmgr import CERNSessionHandler
         cern_auth = CERNSessionHandler(
@@ -137,7 +139,6 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             run_num_mgr = DBRunNumberManager(rundb_socket),
             run_registry = DBConfigSaver(runreg_socket),
             logbook_type = elisa_conf_data,
-            logbook_auth = elisa_auth,
             timeout = timeout,
             use_kerb = kerberos,
             port_offset = port_offset,
@@ -267,11 +268,6 @@ def is_authenticated(rc):
     if not rc.session_handler.nanorc_user_is_authenticated():
         rc.log.error(f'\'{rc.session_handler.nanorc_user.username}\' does not have a valid kerberos ticket, use \'kinit\', or \'change_user\' to create a ticket, [bold]inside nanorc![/]', extra={"markup": True})
         return False
-
-    if not rc.session_handler.elisa_user_is_authenticated():
-        rc.session_handler.authenticate_elisa_user(
-            credentials.get_login('elisa')
-        )
 
     return True
 

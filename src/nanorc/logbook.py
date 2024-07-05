@@ -49,12 +49,15 @@ class FileLogbook:
 
 
 class ElisaHandler:
-    def __init__(self, socket, auth, session_handler):
+    def __init__(self, socket, session_handler):
         self.socket = socket
-        self.auth = auth
         self.session_handler = session_hander
         self.log = logging.getLogger(self.__class__.__name__)
         self.log.info(f'Connected to ELisA logbook at {self.socket}')
+        from .credmgr import credentials
+        auth = credentials.get_login("elisa_logbook")
+        self.API_USER=auth.username
+        self.API_PSWD=auth.password
 
     def _start_new_message_thread(self):
         self.log.info("ELisA logbook: Next message will be a new thread")
@@ -68,10 +71,10 @@ class ElisaHandler:
         data = {'author':user, 'title':subject, 'body':body, 'command':command, 'systems':["daq"]}
 
         if not self.current_id:
-            r = requests.post(f'{self.socket}/v1/elisaLogbook/new_message/', auth=self.auth, data=data)
+            r = requests.post(f'{self.socket}/v1/elisaLogbook/new_message/', auth=(self.API_USER, self.API_PSWD), data=data)
         else:
             data["id"] = self.current_id
-            r = requests.put(f'{self.socket}/v1/elisaLogbook/reply_to_message/', auth=self.auth, data=data)
+            r = requests.put(f'{self.socket}/v1/elisaLogbook/reply_to_message/', auth=(self.API_USER, self.API_PSWD), data=data)
 
         response = r.json()
         if r.status_code != 201:

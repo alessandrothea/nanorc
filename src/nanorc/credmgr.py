@@ -250,9 +250,6 @@ class CERNSessionHandler:
             self.log.error(f'User \'{username}\' cannot authenticate, exiting...')
             exit(1)
 
-        if not self.elisa_user_is_authenticated():
-            self.authenticate_elisa_user()
-
     @staticmethod
     def __get_session_kerberos_cache_path(session_name:str, session_number:int):
         import os
@@ -260,15 +257,6 @@ class CERNSessionHandler:
 
         return Path(
             os.path.expanduser(f'~/.nanorc_userkerbcache_{session_name}_session_{session_number}')
-        )
-
-    @staticmethod
-    def __get_elisa_kerberos_cache_path():
-        import os
-        from pathlib import Path
-
-        return Path(
-            os.path.expanduser(f'~/.nanorc_elisakerbcache')
         )
 
     @staticmethod
@@ -355,48 +343,6 @@ class CERNSessionHandler:
             silent = True,
             ticket_dir = session_kerb_cache,
         )
-
-    def elisa_user_is_authenticated(self):
-        elisa_user = credentials.get_login('elisa')
-
-        return check_kerberos_credentials(
-            against_user = elisa_user.username,
-            silent = True,
-            ticket_dir = CERNSessionHandler.__get_elisa_kerberos_cache_path(),
-        )
-
-
-    def authenticate_elisa_user(self):
-        elisa_user = credentials.get_login('elisa')
-        elisa_kerb_cache = CERNSessionHandler.__get_elisa_kerberos_cache_path()
-        import os
-
-        if not os.path.isdir(elisa_kerb_cache):
-            os.mkdir(elisa_kerb_cache)
-
-        if self.elisa_user_is_authenticated():
-            # we're authenticated, stop here
-            return True
-
-        return new_kerberos_ticket(
-            user = elisa_user.username,
-            realm = elisa_user.realm,
-            password = elisa_user.password,
-            ticket_dir = elisa_kerb_cache,
-        )
-
-    def generate_elisa_cern_cookie(self, website, cookie_dir):
-        elisa_user = credentials.get_login('elisa')
-        elisa_kerb_cache = CERNSessionHandler.__get_elisa_kerberos_cache_path()
-
-        self.authenticate_elisa_user()
-
-        return elisa_user.generate_cern_sso_cookie(
-            website,
-            elisa_kerb_cache,
-            cookie_dir,
-        )
-
 
     def stop_session(self):
         import os
