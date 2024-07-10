@@ -51,7 +51,7 @@ class FileLogbook:
 class ElisaHandler:
     def __init__(self, socket, session_handler):
         self.socket = socket
-        self.session_handler = session_hander
+        self.session_handler = session_handler
         self.log = logging.getLogger(self.__class__.__name__)
         self.log.info(f'Connected to ELisA logbook at {self.socket}')
         auth = credentials.get_login("elisa_logbook")

@@ -120,7 +120,7 @@ def np04cli(ctx, obj, traceback, loglevel, elisa_conf, log_path, cfg_dumpdir, do
             elisa_conf_data = 'file'
 
         if elisa_conf_data != 'file':
-            elisa_socket = cern_profile['elisa_configuration']['socket']
+            elisa_socket = elisa_conf_data['socket']
             logger.info("ELisA socket "+elisa_socket)
 
         from nanorc.credmgr import CERNSessionHandler

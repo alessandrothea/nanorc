@@ -99,7 +99,7 @@ class NanoRC:
 
         if logbook_type != 'file':
             try:
-                self.logbook = ElisaHandler(socket = logbook_type['socket'], session_handler = self.session_handle)
+                self.logbook = ElisaHandler(socket = logbook_type['socket'], session_handler = self.session_handler)
             except Exception as e:
                 self.log.error(f"Couldn't initialise ELisA, reverting to file logbook! {str(e)}")
                 logbook_type = 'file'
