@@ -374,7 +374,7 @@ class NanoRC:
                     run_type = run_type,
                 )
             except Exception as e:
-                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually at {self.logbook.website}\nError text:\n{str(e)}")
+                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually. \nError text:\n{str(e)}")
 
         cfg_save_dir = None
         if self.cfgsvr:
@@ -438,7 +438,7 @@ class NanoRC:
                 )
 
             except Exception as e:
-                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually at {self.logbook.website}\nError text:\n{str(e)}")
+                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually. \nError text:\n{str(e)}")
 
     def stop(self, force:bool, timeout:int, **kwargs) -> NoReturn:
         """
@@ -513,7 +513,7 @@ class NanoRC:
                     session = self.partition,
                 )
             except Exception as e:
-                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually at {self.logbook.website}\nError text:\n{str(e)}")
+                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually. \nError text:\n{str(e)}")
 
         if self.cfgsvr and self.runs:
             try:
