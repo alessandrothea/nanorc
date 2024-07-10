@@ -68,27 +68,34 @@ class ElisaHandler:
     def _send_message(self, subject:str, body:str, command:str):
         user = self.session_handler.nanorc_user.username
         data = {'author':user, 'title':subject, 'body':body, 'command':command, 'systems':["daq"]}
-
-        if not self.current_id:
-            r = requests.post(f'{self.socket}/v1/elisaLogbook/new_message/', auth=(self.API_USER, self.API_PSWD), data=data)
-        else:
-            data["id"] = self.current_id
-            r = requests.put(f'{self.socket}/v1/elisaLogbook/reply_to_message/', auth=(self.API_USER, self.API_PSWD), data=data)
-
-        response = r.json()
-        if r.status_code != 201:
-            self.log.error(f'Exception thrown while inserting data in elisa:')
-            e = (response['response'])
-            self.log.error(e)
-            import logging
-            if logging.DEBUG >= logging.root.level:
-                self.console.print_exception()
-            raise e
-        else:
-            self.current_id = response['thread_id']
-            self.log.info(f"ELisA logbook: Sent message (ID{self.current_id})")
-
-
+        try:
+            if not self.current_id:
+                r = requests.post(f'{self.socket}/v1/elisaLogbook/new_message/', auth=(self.API_USER, self.API_PSWD), json=data)
+            else:
+                data["id"] = self.current_id
+                r = requests.put(f'{self.socket}/v1/elisaLogbook/reply_to_message/', auth=(self.API_USER, self.API_PSWD), json=data)
+            r.raise_for_status()
+            response = r.json()
+            if r.status_code != 201:
+                self.log.error(f'Exception thrown while inserting data in elisa:')
+                e = (response['response'])
+                self.log.error(e)
+                import logging
+                if logging.DEBUG >= logging.root.level:
+                    self.console.print_exception()
+                raise e
+            else:
+                self.current_id = response['thread_id']
+                self.log.info(f"ELisA logbook: Sent message (ID{self.current_id})")
+        except requests.HTTPError as exc:
+            error = f"of HTTP Error (maybe failed auth, maybe ill-formed post message, ...)"
+            self.log.error(error)
+        except requests.ConnectionError as exc:
+            error = f"connection to {self.API_SOCKET} wasn't successful"
+            self.log.error(error)
+        except requests.Timeout as exc:
+            error = f"connection to {self.API_SOCKET} timed out"
+            self.log.error(error)
 
     def message_on_start(self, messages:[str], session:str, run_num:int, run_type:str):
         self._start_new_message_thread()
