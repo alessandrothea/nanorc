@@ -69,6 +69,7 @@ class NanoRC:
         if not use_kerb:
             self.ssh_conf = ["-o GSSAPIAuthentication=no"]
         self.port_offset = port_offset
+        self.configuration_name = top_cfg.path
         self.cfg = TreeBuilder(
             log=self.log,
             top_cfg=top_cfg,
@@ -260,7 +261,7 @@ class NanoRC:
         self.console.print('\n')
         if self.runs:
             print_run_info(self.runs[-1], self.console)
-        print_status(apparatus_id=self.apparatus_id, topnode=self.topnode, console=self.console, partition=self.partition)
+        print_status(apparatus_id=self.apparatus_id, topnode=self.topnode, console=self.console, partition=self.partition, conf=self.configuration_name)
 
     def ls(self, leg:bool) -> NoReturn:
         """
