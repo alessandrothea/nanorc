@@ -35,8 +35,6 @@ from nanorc.common_commands import add_common_cmds, add_custom_cmds, accept_time
 from nanorc.cli import CONTEXT_SETTINGS, loglevels, updateLogLevel
 from nanorc.nano_context import NanoContext
 
-from .logbook import ElisaLogbook
-
 # ------------------------------------------------------------------------------
 @click_shell.shell(prompt='anonymous@np04rc> ', chain=True, context_settings=CONTEXT_SETTINGS)
 @click.version_option(__version__)
