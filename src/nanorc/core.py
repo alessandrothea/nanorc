@@ -13,7 +13,7 @@ from .treebuilder import TreeBuilder
 from .cfgsvr import FileConfigSaver, DBConfigSaver
 from .credmgr import credentials
 from .node_render import print_node, print_status
-from .logbook import ElisaLogbook, FileLogbook
+from .logbook import ElisaHandler, FileLogbook
 import importlib
 from . import confdata
 from rich.traceback import Traceback
@@ -100,11 +100,7 @@ class NanoRC:
 
         if logbook_type != 'file':
             try:
-                self.logbook = ElisaLogbook(
-                    configuration = logbook_type,
-                    console = console,
-                    session_handler = self.session_handler,
-                )
+                self.logbook = ElisaHandler(socket = logbook_type['socket'], session_handler = self.session_handler)
             except Exception as e:
                 self.log.error(f"Couldn't initialise ELisA, reverting to file logbook! {str(e)}")
                 logbook_type = 'file'
@@ -379,7 +375,7 @@ class NanoRC:
                     run_type = run_type,
                 )
             except Exception as e:
-                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually at {self.logbook.website}\nError text:\n{str(e)}")
+                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually. \nError text:\n{str(e)}")
 
         cfg_save_dir = None
         if self.cfgsvr:
@@ -443,7 +439,7 @@ class NanoRC:
                 )
 
             except Exception as e:
-                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually at {self.logbook.website}\nError text:\n{str(e)}")
+                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually. \nError text:\n{str(e)}")
 
     def stop(self, force:bool, timeout:int, **kwargs) -> NoReturn:
         """
@@ -518,7 +514,7 @@ class NanoRC:
                     session = self.partition,
                 )
             except Exception as e:
-                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually at {self.logbook.website}\nError text:\n{str(e)}")
+                self.log.error(f"Couldn't make an entry to the logbook, do it yourself manually. \nError text:\n{str(e)}")
 
         if self.cfgsvr and self.runs:
             try:
